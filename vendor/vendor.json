@@ -1,0 +1,91 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "bPLphZ86uVvcZkaLfrUyw7HM7UY=",
+			"path": "github.com/Bowery/prompt",
+			"revision": "d43c2707a6c5a152a344c64bb4fed657e2908a81",
+			"revisionTime": "2016-08-08T16:52:56Z"
+		},
+		{
+			"checksumSHA1": "kuwREeq736QUok7wyPzN9QsesTo=",
+			"path": "github.com/kardianos/osext",
+			"revision": "c2c54e542fb797ad986b31721e1baedf214ca413",
+			"revisionTime": "2016-08-11T00:15:26Z"
+		},
+		{
+			"checksumSHA1": "t8Pf7saHWmH/CfpV56mKwQIYP0I=",
+			"path": "github.com/kr/binarydist",
+			"revision": "3035450ff8b987ec4373f65c40767f096b35f2d2",
+			"revisionTime": "2016-07-21T04:38:06Z"
+		},
+		{
+			"checksumSHA1": "LnzDopuGp/VMkmtInf+Mka8yPz8=",
+			"path": "github.com/labstack/gommon/color",
+			"revision": "445cf40e6de4cbef35daf3285ff5212c91e78262",
+			"revisionTime": "2016-07-19T15:51:39Z"
+		},
+		{
+			"checksumSHA1": "D5y31enkHX0gqJYnAXDFDn3EBkE=",
+			"path": "github.com/mandarl/go-selfupdate/selfupdate",
+			"revision": "45d0be759f6761f98158f684f9341751f10f5533",
+			"revisionTime": "2016-07-26T01:54:35Z"
+		},
+		{
+			"checksumSHA1": "kieUhLdXLUMTwTRxiA2WO7Xkk30=",
+			"path": "github.com/mattn/go-colorable",
+			"revision": "ed8eb9e318d7a84ce5915b495b7d35e0cfe7b5a8",
+			"revisionTime": "2016-07-31T23:54:17Z"
+		},
+		{
+			"checksumSHA1": "Xe1H36zS96+8urk4a0bYdNY3mnw=",
+			"path": "github.com/mattn/go-isatty",
+			"revision": "66b8e73f3f5cda9f96b69efd03dd3d7fc4a5cdb8",
+			"revisionTime": "2016-08-06T12:27:52Z"
+		},
+		{
+			"checksumSHA1": "/WWaXqaTd+uMVIvID4rwqs54LMo=",
+			"path": "github.com/mkideal/cli",
+			"revision": "1039602d251ab9e276e1254037b775c7e770d8e9",
+			"revisionTime": "2016-07-30T15:02:56Z"
+		},
+		{
+			"checksumSHA1": "lKMc0ouPkh8sLT4HIxFcXnCg/W0=",
+			"path": "github.com/mkideal/pkg/debug",
+			"revision": "f3d0b6b8e48b23bf2cb03d208c45c469b69b5798",
+			"revisionTime": "2016-07-30T07:50:40Z"
+		},
+		{
+			"checksumSHA1": "WscTG9AjVIpNvE0OI+Wwtq6bdVg=",
+			"path": "github.com/mkideal/pkg/expr",
+			"revision": "f3d0b6b8e48b23bf2cb03d208c45c469b69b5798",
+			"revisionTime": "2016-07-30T07:50:40Z"
+		},
+		{
+			"checksumSHA1": "4KdS8PtABcyN54d+p6g8GGiAkbA=",
+			"path": "github.com/pkg/errors",
+			"revision": "a22138067af1c4942683050411a841ade67fe1eb",
+			"revisionTime": "2016-08-08T05:55:40Z"
+		},
+		{
+			"checksumSHA1": "8fD/im5Kwvy3JgmxulDTambmE8w=",
+			"path": "golang.org/x/sys/unix",
+			"revision": "a646d33e2ee3172a661fc09bca23bb4889a41bc8",
+			"revisionTime": "2016-07-15T05:43:45Z"
+		},
+		{
+			"checksumSHA1": "xONNan7OI+wNUZ496qn0ecINL40=",
+			"path": "gopkg.in/inconshreveable/go-update.v0",
+			"revision": "d8b0b1d421aa1cbf392c05869f8abbc669bb7066",
+			"revisionTime": "2015-08-14T20:01:26Z"
+		},
+		{
+			"checksumSHA1": "oIIqdO4C5N+AQimgXbehWC7PUeg=",
+			"path": "gopkg.in/inconshreveable/go-update.v0/download",
+			"revision": "d8b0b1d421aa1cbf392c05869f8abbc669bb7066",
+			"revisionTime": "2015-08-14T20:01:26Z"
+		}
+	],
+	"rootPath": "github.com/mandarl/android-sdk-mirror"
+}

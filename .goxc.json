@@ -1,0 +1,19 @@
+{
+	"OutPath": "{{.Dest}}{{.PS}}{{.Version}}{{.PS}}{{.Os}}-{{.Arch}}{{.PS}}{{.AppName}}{{.Ext}}",
+	"AppName": "go-template",
+	"TasksExclude": ["deb", "deb-dev"],
+	"Tasks": [
+		"default",
+		"publish-github"
+	],
+	"Arch": "386 amd64",
+	"BuildConstraints": "linux windows darwin",
+	"PackageVersion": "1.0.0",
+	"TaskSettings": {
+		"publish-github": {
+			"owner": "mandarl",
+			"repository": "appnameplaceholder"
+		}
+	},
+	"ConfigVersion": "0.9"
+}

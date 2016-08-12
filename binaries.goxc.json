@@ -1,0 +1,17 @@
+{
+	"OutPath": "{{.Dest}}{{.PS}}{{.Version}}{{.PS}}{{.AppName}}{{.PS}}{{.Os}}-{{.Arch}}",
+	"AppName": "appnameplaceholder",
+	"TasksExclude": ["deb", "deb-dev", "rmbin", "archive", "go-install", "downloads-page"],
+	"Tasks": [
+		"default"
+	],
+	"Arch": "386 amd64",
+	"Os": "linux windows darwin",
+	"BuildConstraints": "linux windows darwin",
+	"PackageVersion": "1.0.0",
+    "Resources": {
+        "Include": "",
+        "Exclude": "*.md"
+    },
+	"ConfigVersion": "0.9"
+}
