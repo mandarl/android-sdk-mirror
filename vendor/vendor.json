@@ -9,6 +9,24 @@
 			"revisionTime": "2016-08-08T16:52:56Z"
 		},
 		{
+			"checksumSHA1": "4VHbQgg0Q/g2Qa/csnhn03OqgHM=",
+			"path": "github.com/PuerkitoBio/goquery",
+			"revision": "7f4291566cf7cac3be222a933e01a2bed97532b1",
+			"revisionTime": "2016-07-28T01:43:13Z"
+		},
+		{
+			"checksumSHA1": "X9r5gpnkfBN90eD4jOfGVrmCZ5o=",
+			"path": "github.com/andybalholm/cascadia",
+			"revision": "3ad29d1ad1c4f2023e355603324348cf1f4b2d48",
+			"revisionTime": "2015-07-30T17:44:59Z"
+		},
+		{
+			"checksumSHA1": "eOpMXKMZ8F0RxaurujvFXZfIWBY=",
+			"path": "github.com/cavaliercoder/grab",
+			"revision": "2e3d93bfd60c32b49139f0f4175d457d726d0ea8",
+			"revisionTime": "2016-08-05T01:56:53Z"
+		},
+		{
 			"checksumSHA1": "kuwREeq736QUok7wyPzN9QsesTo=",
 			"path": "github.com/kardianos/osext",
 			"revision": "c2c54e542fb797ad986b31721e1baedf214ca413",
@@ -67,6 +85,18 @@
 			"path": "github.com/pkg/errors",
 			"revision": "a22138067af1c4942683050411a841ade67fe1eb",
 			"revisionTime": "2016-08-08T05:55:40Z"
+		},
+		{
+			"checksumSHA1": "vqc3a+oTUGX8PmD0TS+qQ7gmN8I=",
+			"path": "golang.org/x/net/html",
+			"revision": "07b51741c1d6423d4a6abab1c49940ec09cb1aaf",
+			"revisionTime": "2016-08-11T10:50:59Z"
+		},
+		{
+			"checksumSHA1": "00eQaGynDYrv3tL+C7l9xH0IDZg=",
+			"path": "golang.org/x/net/html/atom",
+			"revision": "07b51741c1d6423d4a6abab1c49940ec09cb1aaf",
+			"revisionTime": "2016-08-11T10:50:59Z"
 		},
 		{
 			"checksumSHA1": "8fD/im5Kwvy3JgmxulDTambmE8w=",
