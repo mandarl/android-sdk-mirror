@@ -15,6 +15,12 @@
 			"revisionTime": "2016-07-28T01:43:13Z"
 		},
 		{
+			"checksumSHA1": "J4r+k4ROTO6ao9LGa48oQAsFAMQ=",
+			"path": "github.com/Sirupsen/logrus",
+			"revision": "08a8a7c27e3d058a8989316a850daad1c10bf4ab",
+			"revisionTime": "2016-08-13T15:40:05Z"
+		},
+		{
 			"checksumSHA1": "X9r5gpnkfBN90eD4jOfGVrmCZ5o=",
 			"path": "github.com/andybalholm/cascadia",
 			"revision": "3ad29d1ad1c4f2023e355603324348cf1f4b2d48",
@@ -25,6 +31,12 @@
 			"path": "github.com/cavaliercoder/grab",
 			"revision": "2e3d93bfd60c32b49139f0f4175d457d726d0ea8",
 			"revisionTime": "2016-08-05T01:56:53Z"
+		},
+		{
+			"checksumSHA1": "TzeQ/g1e4fLB5QZIuSNC+uHp7gA=",
+			"path": "github.com/dustin/go-humanize",
+			"revision": "2fcb5204cdc65b4bec9fd0a87606bb0d0e3c54e8",
+			"revisionTime": "2016-07-21T06:51:13Z"
 		},
 		{
 			"checksumSHA1": "kuwREeq736QUok7wyPzN9QsesTo=",
@@ -63,6 +75,12 @@
 			"revisionTime": "2016-08-06T12:27:52Z"
 		},
 		{
+			"checksumSHA1": "WXCH1zXEDNaO/Ewu0CNcnfLp4ho=",
+			"path": "github.com/mgutz/ansi",
+			"revision": "c286dcecd19ff979eeb73ea444e479b903f2cfcb",
+			"revisionTime": "2015-09-14T16:22:38Z"
+		},
+		{
 			"checksumSHA1": "/WWaXqaTd+uMVIvID4rwqs54LMo=",
 			"path": "github.com/mkideal/cli",
 			"revision": "1039602d251ab9e276e1254037b775c7e770d8e9",
@@ -85,6 +103,12 @@
 			"path": "github.com/pkg/errors",
 			"revision": "a22138067af1c4942683050411a841ade67fe1eb",
 			"revisionTime": "2016-08-08T05:55:40Z"
+		},
+		{
+			"checksumSHA1": "g6eZ+gvSPL/5R1wgCx5UpY7AmXs=",
+			"path": "github.com/shopspring/decimal",
+			"revision": "74d668a796fa3734c552fb907d9b83146d0bebee",
+			"revisionTime": "2016-03-11T12:45:26Z"
 		},
 		{
 			"checksumSHA1": "vqc3a+oTUGX8PmD0TS+qQ7gmN8I=",

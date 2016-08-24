@@ -2,13 +2,9 @@ package main
 
 import (
 	"encoding/hex"
-	"encoding/xml"
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
-	"math"
-	"math/big"
 	"net/http"
 	"os"
 	"regexp"
@@ -17,39 +13,26 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	log "github.com/Sirupsen/logrus"
 	"github.com/cavaliercoder/grab"
+	humanize "github.com/dustin/go-humanize"
+	"github.com/mgutz/ansi"
 	"github.com/pkg/errors"
+	"github.com/shopspring/decimal"
 )
 
 type archive struct {
 	archiveType string
-	Size        int    `xml:"size"`
-	Checksum    string `xml:"checksum"`
-	URL         string `xml:"url"`
+	Size        uint64
+	Checksum    string
+	URL         string
+	Version     decimal.Decimal
 	request     *grab.Request
-}
-
-type repo struct {
-	Items []struct {
-		XMLName  xml.Name
-		RepoType struct {
-			APILevel int    `xml:"revision"`
-			Desc     string `xml:"description"`
-			Obsolete bool   `xml:"obsolete"`
-			Archives struct {
-				ArchiveItem []struct {
-					Size     int    `xml:"size"`
-					Checksum string `xml:"checksum"`
-					URL      string `xml:"url"`
-				} `xml:"archive"`
-			} `xml:"archives"`
-		}
-	} `xml:",any"`
 }
 
 //Process is entry point for processing a repository url
 //takes the url and the output directory path to save assets
-func Process(url string, outputDir string) {
+func Process(url string, outputDir string, silent bool) {
 	fmt.Printf("Start processing for url: %s\n", url)
 	fmt.Printf("Assets will be downloaded to: %s\n", outputDir)
 	repoXML, err := fetchFile(url)
@@ -57,13 +40,13 @@ func Process(url string, outputDir string) {
 		panic(err)
 	}
 	writeFile(url, outputDir)
-	err = processRepo(repoXML)
+	err = processRepo(repoXML, silent)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func processRepo(repoXML string) error {
+func processRepo(repoXML string, silent bool) error {
 	repoXML = sanitizeXML(repoXML)
 
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(repoXML))
@@ -72,8 +55,8 @@ func processRepo(repoXML string) error {
 	}
 	//html, _ := doc.Html()
 	//fmt.Printf("%s\n", html)
-	getArchives(doc)
-	//downloadArchives(archives)
+	archives := getArchives(doc)
+	downloadArchives(archives, silent)
 	return nil
 }
 
@@ -92,7 +75,7 @@ func sanitizeXML(repoXML string) string {
 func getArchives(doc *goquery.Document) []*archive {
 	var archives []*archive
 
-	//var archiveTypes map[string][]archive
+	archiveTopVersion := map[string]decimal.Decimal{}
 	//get all relevant data from xml into archive struct
 	doc.Find("archives").Each(func(i int, archiveNode *goquery.Selection) {
 		//fmt.Printf("%s\n", goquery.NodeName(archiveNode))
@@ -106,27 +89,41 @@ func getArchives(doc *goquery.Document) []*archive {
 		}
 
 		apiLevel := getAPIVersion(archiveTypeNode)
-		if apiLevel == 0 {
+		if apiLevel.Cmp(decimal.NewFromFloat(0)) == 0 {
 			revision := archiveTypeNode.Find("revision>major").Text() + "." +
 				archiveTypeNode.Find("revision>minor").Text() +
 				archiveTypeNode.Find("revision>micro").Text()
-			fmt.Printf("%s\n", revision)
-			apiLevel, _ = strconv.Atoi(revision)
+			//fmt.Printf("%s\n", revision)
+			apiLevel, _ = decimal.NewFromString(revision)
 		}
 
-		fmt.Printf("%s, \t\t%d\n", archiveTypeName, apiLevel)
+		apiLevelOld := archiveTopVersion[archiveTypeName]
+		if apiLevelOld.Cmp(apiLevel) == -1 {
+			archiveTopVersion[archiveTypeName] = apiLevel
+			//fmt.Printf("%s: new max api:%s, oldAPI: %s\n", archiveTypeName, apiLevel.String(), apiLevelOld.String())
+		}
 
-		//if shouldDownload(archiveTypeNode) {
-		//nodes.Find("archive").Each(func(i int, node *goquery.Selection) {
-		// checksum := node.Find("checksum").Text()
-		// url := node.Find("url").Text()
-		// archives = append(archives, &archive{checksum, url, nil})
-		//})
-		//}
+		archiveNode.Find("archive").Each(func(i int, node *goquery.Selection) {
+			checksum := node.Find("checksum").Text()
+			url := node.Find("url").Text()
+			size, _ := strconv.ParseUint(node.Find("size").Text(), 10, 64)
+			archives = append(archives, &archive{archiveTypeName, size, checksum, url, apiLevel, nil})
+			//fmt.Printf("%s, \t\t%d\n", archiveTypeName, size)
+		})
 	})
 
 	//filter out the archive structs that we dont want
-	return archives
+	var filteredArchives []*archive
+	for _, value := range archives {
+		if archiveTopVersion[value.archiveType].Cmp(value.Version) == 0 {
+			filteredArchives = append(filteredArchives, value)
+		}
+	}
+
+	for i, value := range filteredArchives {
+		log.Debug(fmt.Sprintf("%d: %v", i, value))
+	}
+	return filteredArchives
 }
 
 func getArchiveTypeNode(archiveNode *goquery.Selection) *goquery.Selection {
@@ -134,13 +131,10 @@ func getArchiveTypeNode(archiveNode *goquery.Selection) *goquery.Selection {
 	return parent
 }
 
-func getAPIVersion(node *goquery.Selection) big.Rat {
-	level := big.NewRat(0, math.MaxInt64)
-	outerHTML, _ := goquery.OuterHtml(node)
-	doc, _ := goquery.NewDocumentFromReader(strings.NewReader(outerHTML))
-	if doc.Has("api-level").Length() > 0 {
-		//fmt.Printf("%s\n", outerHTML)
-		level, _ = big.NewRat(doc.Find("api-level").First().Text())
+func getAPIVersion(node *goquery.Selection) decimal.Decimal {
+	var level decimal.Decimal
+	if node.Has("api-level").Length() > 0 {
+		level, _ = decimal.NewFromString(node.Find("api-level").Text())
 	}
 	return level
 }
@@ -148,7 +142,7 @@ func getAPIVersion(node *goquery.Selection) big.Rat {
 func shouldDownload(parent *goquery.Selection) bool {
 	nodesToFilterOut := []string{"doc", "sdk-source"}
 	parentName := goquery.NodeName(parent)
-	if !stringInSlice(parentName, nodesToFilterOut) {
+	if !containsString(nodesToFilterOut, parentName) {
 		fmt.Printf("will dld parent: %v\turl: %v\n", parentName, parent.Find("url").Text())
 		// siblings.Each(func(i int, node *goquery.Selection) {
 		// 	fmt.Printf("node: %v\n", goquery.NodeName(node))
@@ -157,25 +151,32 @@ func shouldDownload(parent *goquery.Selection) bool {
 	return false
 }
 
-func stringInSlice(a string, list []string) bool {
-	for _, b := range list {
-		if b == a {
-			return true
-		}
+func getTotalSize(archives []*archive) uint64 {
+	var totalSize uint64
+	for _, value := range archives {
+		totalSize += value.Size
 	}
-	return false
+	return totalSize
 }
 
-func downloadArchives(archives []*archive) {
+func downloadArchives(archives []*archive, silent bool) {
+	if !silent {
+		totalSize := getTotalSize(archives)
+		msgFiles := ansi.Color(fmt.Sprintf("%d file(s) of total size: %v", len(archives), humanize.Bytes(totalSize)), "red+b:white")
+		fmt.Printf("Are you sure you want to download %s (yes/no): ", msgFiles)
+		goAhead := askForConfirmation()
+		if !goAhead {
+			return
+		}
+	}
 	var reqs []*grab.Request
 	for _, file := range archives {
-		fmt.Printf("%s\n", getFileURL(file.URL))
-		continue
+		log.Debug(fmt.Sprintf("Got url: %s\n", getFileURL(file.URL)))
 		req, err := grab.NewRequest(getFileURL(file.URL))
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error downloading:%s\n%v\n", file.URL, err)
+			log.Error(fmt.Sprintf("Error downloading:%s\n%v\n", file.URL, err))
 		}
-		//file.request = req
+		file.request = req
 		hexCheckSum, _ := hex.DecodeString(file.Checksum)
 		req.SetChecksum("sha1", hexCheckSum)
 		req.Filename = file.URL
@@ -183,7 +184,7 @@ func downloadArchives(archives []*archive) {
 	}
 
 	client := grab.NewClient()
-	respch := client.DoBatch(2, reqs...)
+	respch := client.DoBatch(3, reqs...)
 
 	t := time.NewTicker(200 * time.Millisecond)
 

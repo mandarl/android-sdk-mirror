@@ -11,8 +11,9 @@
             "host": "127.0.0.1",
             "program": "${workspaceRoot}",
             "env": {},
-            "args": ["--url=http://dl.google.com/android/repository/repository-11.xml",
-                "--output-dir=repository"
+            "args": ["--url=http://dl.google.com/android/repository/addon.xml",
+                "--output-dir=repository",
+                "--silent"
             ]
         }
     ]

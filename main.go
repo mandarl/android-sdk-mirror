@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/mandarl/go-selfupdate/selfupdate"
 	"github.com/mkideal/cli"
 )
@@ -17,6 +18,8 @@ type argT struct {
 	Url       string `cli:"*u,url" usage:"url of the repository you want to mirror"`
 	OutputDir string `cli:"o,output-dir" usage:"output directory to save downloaded assets" dft:"."`
 	Version   bool   `cli:"!v,version" usage:"print the current version"`
+	Verbose   bool   `cli:"verbose" usage:"enable verbose logging"`
+	Silent    bool   `cli:"q,silent" usage:"suppresses any user input prompts"`
 }
 
 func main() {
@@ -33,9 +36,14 @@ func run(args *argT) {
 		fmt.Printf("android-sdk-mirror: Verison: %s\n", VERSION)
 		os.Exit(0)
 	}
+	if args.Verbose {
+		log.SetLevel(log.DebugLevel)
+	} else {
+		log.SetLevel(log.ErrorLevel)
+	}
 
 	runUpdate()
-	Process(args.Url, args.OutputDir)
+	Process(args.Url, args.OutputDir, args.Silent)
 }
 
 func runUpdate() {
