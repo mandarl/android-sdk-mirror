@@ -30,40 +30,49 @@ type archive struct {
 	request     *grab.Request
 }
 
+const urlRepo11 = "http://dl.google.com/android/repository/repository-11.xml"
+const urlAddonsList2 = "http://dl.google.com/android/repository/addons_list-2.xml"
+const urlAddon = "http://dl.google.com/android/repository/addon.xml"
+
 //Process is entry point for processing a repository url
 //takes the url and the output directory path to save assets
 func Process(url string, outputDir string, silent bool) {
-	fmt.Printf("Start processing for url: %s\n", url)
-	fmt.Printf("Assets will be downloaded to: %s\n", outputDir)
-	repoXML, err := fetchFile(url)
-	if err != nil {
-		panic(err)
+	var archives []*archive
+	if url == "" {
+		archives = processRepo(urlRepo11, outputDir, silent)
+		writeFile(urlAddonsList2, outputDir)
+		archives = append(archives, processRepo(urlAddon, outputDir, silent)...)
+	} else {
+		archives = processRepo(url, outputDir, silent)
 	}
-	writeFile(url, outputDir)
-	err = processRepo(repoXML, silent)
-	if err != nil {
-		panic(err)
-	}
+	downloadArchives(archives, outputDir, silent)
 }
 
-func processRepo(repoXML string, silent bool) error {
+func processRepo(url string, outputDir string, silent bool) []*archive {
+	fmt.Printf(ansi.Color(fmt.Sprintf("Start processing for url: %s", url), "blue+b:white"))
+	fmt.Printf("\nAssets will be downloaded to: %s\n", outputDir)
+	repoXML, err := fetchFile(url)
+	if err != nil {
+		log.Error("Unable to fetch repo XML", err)
+		return nil
+	}
+	writeFile(url, outputDir)
 	repoXML = sanitizeXML(repoXML)
-
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(repoXML))
 	if err != nil {
-		return errors.Wrap(err, "Unable to parse repo XML")
+		log.Error("Unable to parse repo XML", err)
+		return nil
 	}
 	//html, _ := doc.Html()
 	//fmt.Printf("%s\n", html)
-	archives := getArchives(doc)
-	downloadArchives(archives, silent)
-	return nil
+
+	return getArchives(doc)
 }
 
 func sanitizeXML(repoXML string) string {
 	repoXML = strings.Replace(repoXML, "sdk:", "", -1)
 	repoXML = strings.Replace(repoXML, "<obsolete/>", "<obsolete>true</obsolete>", -1)
-	repoXML = strings.Replace(repoXML, "source>", "sdk-source>", -1) //"<obsolete>true</obsolete>", -1)
+	repoXML = strings.Replace(repoXML, "source>", "sdk-source>", -1)
 	reg, err := regexp.Compile("<[^<]*?/>")
 	if err != nil {
 		log.Fatal(err)
@@ -151,18 +160,23 @@ func shouldDownload(parent *goquery.Selection) bool {
 	return false
 }
 
-func getTotalSize(archives []*archive) uint64 {
+func getTotalSize(archives []*archive, outputDir string) (uint64, int) {
 	var totalSize uint64
+	var num int
 	for _, value := range archives {
-		totalSize += value.Size
+		fullname := outputDir + string(os.PathSeparator) + value.URL
+		if _, err := os.Stat(fullname); err != nil {
+			totalSize += value.Size
+			num++
+		}
 	}
-	return totalSize
+	return totalSize, num
 }
 
-func downloadArchives(archives []*archive, silent bool) {
+func downloadArchives(archives []*archive, outputDir string, silent bool) {
 	if !silent {
-		totalSize := getTotalSize(archives)
-		msgFiles := ansi.Color(fmt.Sprintf("%d file(s) of total size: %v", len(archives), humanize.Bytes(totalSize)), "red+b:white")
+		totalSize, num := getTotalSize(archives, outputDir)
+		msgFiles := ansi.Color(fmt.Sprintf("%d file(s) of total size: %v", num, humanize.Bytes(totalSize)), "red+b:white")
 		fmt.Printf("Are you sure you want to download %s (yes/no): ", msgFiles)
 		goAhead := askForConfirmation()
 		if !goAhead {
@@ -179,7 +193,7 @@ func downloadArchives(archives []*archive, silent bool) {
 		file.request = req
 		hexCheckSum, _ := hex.DecodeString(file.Checksum)
 		req.SetChecksum("sha1", hexCheckSum)
-		req.Filename = file.URL
+		req.Filename = outputDir + string(os.PathSeparator) + file.URL
 		reqs = append(reqs, req)
 	}
 

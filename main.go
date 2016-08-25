@@ -15,11 +15,13 @@ var VERSION string = "dev"
 
 type argT struct {
 	cli.Helper
-	Url       string `cli:"*u,url" usage:"url of the repository you want to mirror"`
-	OutputDir string `cli:"o,output-dir" usage:"output directory to save downloaded assets" dft:"."`
+	Url       string `cli:"u,url" usage:"url of the repository you want to mirror"`
+	OutputDir string `cli:"*o,output-dir" usage:"output directory to save downloaded assets" dft:"."`
 	Version   bool   `cli:"!v,version" usage:"print the current version"`
 	Verbose   bool   `cli:"verbose" usage:"enable verbose logging"`
 	Silent    bool   `cli:"q,silent" usage:"suppresses any user input prompts"`
+	Serve     bool   `cli:"s,serve" usage:"simple built-in webserver serves files from the outputDir"`
+	Port      int    `cli:"p,serve-port" usage:"port to serve files" dft:"80"`
 }
 
 func main() {
@@ -41,9 +43,12 @@ func run(args *argT) {
 	} else {
 		log.SetLevel(log.ErrorLevel)
 	}
-
 	runUpdate()
-	Process(args.Url, args.OutputDir, args.Silent)
+	if args.Serve {
+		startWebServer(args.OutputDir, args.Port)
+	} else {
+		Process(args.Url, args.OutputDir, args.Silent)
+	}
 }
 
 func runUpdate() {
